@@ -348,7 +348,7 @@ fi
   kustomize create
   # Simply removing it breaks the ability to apply this change as an update operation because the labeled fields are immutable.
   kustomize edit add label "app.kubernetes.io/name":"${INFRA_NAME}"
-  kustomize edit add base "../base/custom-metrics/"
+  #kustomize edit add base "../base/custom-metrics/"
   kustomize edit add base "../base/ingress/"
   kustomize edit add base "../base/node/"
   kustomize edit add base "../base/pod-broker/"
