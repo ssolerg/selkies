@@ -112,7 +112,7 @@ resource "google_compute_target_https_proxy" "ingress" {
   project          = var.project_id
   name             = "istio-ingressgateway-${var.region}"
   url_map          = google_compute_url_map.ingress.self_link
-  ssl_certificates = concat(list(google_compute_managed_ssl_certificate.ingress.self_link), values(google_compute_managed_ssl_certificate.extras).*.self_link)
+  ssl_certificates = concat(tolist([google_compute_managed_ssl_certificate.ingress.self_link]), values(google_compute_managed_ssl_certificate.extras).*.self_link)
 }
 
 # Forwarding rule - HTTP
