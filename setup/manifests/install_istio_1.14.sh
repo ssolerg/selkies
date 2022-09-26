@@ -26,9 +26,19 @@ function log_red() { echo -e "${RED}$@${NC}"; }
 
 [[ -z "${ISTIOCTL}" ]] && log_red "Missing ISTIOCTL env var." && exit 1
 
+#Validating if istio-system ns exist
+ISTIO_SYSTEM_NS=$(kubectl get ns istio-system -o json | jq -r '.metadata.name')
+if [[ "${ISTIO_SYSTEM_NS}" != "istio-system" ]]; then  
+    kubectl create ns istio-system
+    log_cyan "Do not exist istio-system namespace. Creating..."
+else
+    log_green "Istio-system namespace exist. Reusing..."  
+fi
+
 log_cyan "Installing Istio control plane..."
 ${ISTIOCTL} manifest generate --set profile=default | kubectl apply -f -
-## wait for EnvoyFilter crd to be ready and reapply 
+## wait for EnvoyFilter crd to be ready and reapply
+log_cyan "Waiting 60s for EnvoyFilter crd to be ready and reapply"
 sleep 60
 ${ISTIOCTL} manifest generate --set profile=default | kubectl apply -f -
 kubectl label ns istio-system install.operator.istio.io/owner-kind=IstioControlPlane --overwrite=true
