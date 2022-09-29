@@ -63,3 +63,27 @@ module "cloud-nat" {
   router     = google_compute_router.router-nat.name
   nat_ips    = google_compute_address.nat-address.*.self_link
 }
+
+
+# Custom itopia WebRTC(TURN) ingress rule
+resource "google_compute_firewall" "webrtc" {
+  name = "allow-gke-turn-${var.region}"
+  network  = data.google_compute_network.broker.id
+  description = "Network Rule for WebRTC(TURN) ingress."
+
+  allow {
+    protocol = "tcp"
+    ports    = ["443", "25000-65535"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["80", "25000-65535"]
+  }
+
+  #Example Tags: gke-broker-us-east1, gke-broker-us-east1-349046c7-node, gke-broker-us-east1-default-node-pool
+  #target_tags   = ["gke-broker"]
+  
+  target_tags   = ["gke-broker-${var.region}", "gke-broker-${var.region}-default-node-pool"]
+  source_ranges = ["0.0.0.0/0"]
+}
